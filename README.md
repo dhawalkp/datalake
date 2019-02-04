@@ -18,4 +18,11 @@
 * Use Compaction Technique periodically to delete the old objects for the same key.
 * DMS CDC/Full Load files contains timestamp in the name and should be used to process the data based on this. Care must be taken to make sure multiple CDC Records for same key are not processed in parallel to avoid Data Consistency issues during CDC records consolidation phase.
 
+## Assumptions
+* The CDC logfile will not contain multiple CDC Log records for same Key. In case this is true, the source table must have Update/Modified Time Stamp so that the Compaction Script can use the time stamp for compaction logic in Consistent manner otherwise the compaction may cause to eventually retain the old instead of latest mutation of the data.
+* Since S3 updates are eventual consistent, a mechanism needs to be developed to make sure the data being queried are not being mutated at the same time. You have to employ the use of temporary scratch location and then compact in tier-3 bucket for example.
+* The ETL job should be aware of idempotence requirements. Since CDC Records presents the latest copy of entire record, the idempotence should not be a concern for ETL job in this case.
+* The solution must be aware of the performance tuning and limits of DMS service as mentioned here -https://docs.aws.amazon.com/dms/latest/userguide/CHAP_BestPractices.html
+* 
+
 
