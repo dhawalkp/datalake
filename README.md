@@ -40,7 +40,7 @@ The implementation consists of
 * The Tier-2 S3 bucket will eventually have Partitions consisting of multiple versions of S3 Objects for same key.
 
 ## Compaction ETL Job
-* The Compaction job i.e. basically deletes the older versions of Objects for all the partitions in tier-2 bucket. In this example, the script uses the last modified time stamp of S3 Object to build the compaction logic. Please refer to additional considerations section below in this documentation for alternative approaches to preserve the consistency.
+* The Compaction job i.e. Compaction_Job.py basically deletes the older versions of Objects for all the partitions in tier-2 bucket. In this example, the script uses the last modified time stamp of S3 Object to build the compaction logic. Please refer to additional considerations section below in this documentation for alternative approaches to preserve the consistency.
 
 
 ## Detailed Data Lake Formation Architecture
