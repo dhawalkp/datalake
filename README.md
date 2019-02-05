@@ -36,7 +36,7 @@ The implementation consists of
 * AWS Glue Crawlers needs to be configured in order to process CDC and Full Log files in the tier-1 bucket and create data catalog for both. In this case, the Tier-1 Database in Glue will consist of 2 tables i.e. CDC and Full
 
 ## Glue ETL Job for Tier-2 Data
-* Tier-2 ETL job will re-partition based on required keys and hydrate the tier-2 buckets in S3 with S3 Objects based on the partition keys. The script is available in this repo with name - 
+* Tier-2 ETL job will re-partition based on required keys and hydrate the tier-2 buckets in S3 with S3 Objects based on the partition keys. The script is available in this repo with name - DMS_CDC_Crawler.py and DMS_Full_Crawler.py
 * The Tier-2 S3 bucket will eventually have Partitions consisting of multiple versions of S3 Objects for same key.
 
 ## Compaction ETL Job
