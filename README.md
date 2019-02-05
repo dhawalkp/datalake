@@ -23,3 +23,4 @@
 * Since S3 updates are eventual consistent, a mechanism needs to be developed to make sure the data being queried are not being mutated at the same time. You have to employ the use of temporary scratch location and then compact in tier-3 bucket for example.
 * The ETL job should be aware of idempotence requirements. Since CDC Records presents the latest copy of entire record, the idempotence should not be a concern for ETL job in this case.
 * The solution must be aware of the performance tuning and limits of DMS service as mentioned here -https://docs.aws.amazon.com/dms/latest/userguide/CHAP_BestPractices.html
+* There may be delays in S3 Upserts and so reliance on S3 Object Last Modified Time may cause inconsistent results. An alternative approach could be to use the DMS CDC logtimestamp or Update Time Stamp column (if present) of the original data and add as meta data in S3 Object and use that for compaction job.
