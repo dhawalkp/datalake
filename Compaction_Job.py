@@ -3,7 +3,7 @@ from collections import defaultdict
 from operator import attrgetter
 
 
-##  AUTHORED BY dhawalkp@amazon.com
+##  AUTHORED BY Dhawal Patel 
 ## This AWS Glue Python Script does the "Compaction" of the Mutable Data Objects based on S3 Object's LastModificationTime. 
 ## The Compaction script deletes the old objects. The script can be scheduled periodically via AWS CloudWatch as well. 
 ## This script needs performance tuned to reduce Memory and Time Complexity. The Grouping and Parsing the list multiple times increases the Big O. 
