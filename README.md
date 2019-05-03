@@ -1,3 +1,6 @@
+*Disclaimer: This code must not be used for production use as is. This sample is developed only to educate the users in using some of the features of the AWS in developing a ETL Pipeline using AWS Glue and other services. This is my personal github location and is maintained solely by me.
+This is not the official AWS Open source repository.*
+
 # DataLake Formation in AWS
 
 A Data lake contains all data, both raw sources over extended periods of time as well as any processed data. They enable users across multiple business units to refine, explore and enrich data on their terms. Also, enables multiple data access patterns across a shared infrastructure: batch, interactive, online, search, in-memory and other processing engines.
