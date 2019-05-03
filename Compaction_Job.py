@@ -3,7 +3,7 @@ from collections import defaultdict
 from operator import attrgetter
 
 
-##  AUTHORED BY Dhawal Patel 
+##  AUTHORED BY dhawalkp@amazon.com
 ## This AWS Glue Python Script does the "Compaction" of the Mutable Data Objects based on S3 Object's LastModificationTime. 
 ## The Compaction script deletes the old objects. The script can be scheduled periodically via AWS CloudWatch as well. 
 ## This script needs performance tuned to reduce Memory and Time Complexity. The Grouping and Parsing the list multiple times increases the Big O. 
@@ -19,9 +19,12 @@ from operator import attrgetter
 s3 = boto3.client('s3')
 
 ## Constants and Configuration Variables
-CONST_BUCKET_NAME='employee-bucket-dev'
-CONST_PREFIX_NAME='Tier-2/employee_id'
+## SOURCE BUCKET NAME
+CONST_BUCKET_NAME='octank-energy-datalake-west'
+## SOURCE OBJECT PREFIX
+CONST_PREFIX_NAME='Tier-2/Customer/customerid'
 CONST_SUFFIX_NAME=''
+## SUFFIXES NEEDS TO BE EXCLUDED
 CONST_EXCLUDE_NAME='$folder$'
 CONST_LASTMODIFIEDTIME_STR='lastModifiedTime'
 CONST_LASTMODIFIEDATTR_STR='LastModified'
@@ -30,6 +33,7 @@ CONST_LASTMODIFIEDATTR_STR='LastModified'
 ## file -> Key of S3 Object
 ## lastModifiedTime -> Last Modified Time in millis since epoch
 ## type -> type of the DMS Record i.e. U/I/D
+## This script currently handles U CDC records only. The script needs to be enhanced to handle other records.
 
 class Tuple:
     def __init__(self, file, lastModifiedTime, type):
@@ -71,13 +75,13 @@ def get_matching_s3_keys(bucket, prefix='', suffix='',exclude=''):
             
             if key.startswith(prefix) and key.endswith(suffix) and not exclude in key:
                 # Returning a list with PartitionKey and Last Modified time in secs since epoch (%s)
-                #tempTupleList=partitionKey[key.split('/')[1]]
-                #partitionKey[key.split('/')[1]]=tempTupleList.append(Tuple(key,obj['LastModified'].strftime('%s'),'U'))
                 
                 Obj = Tuple(key,obj[CONST_LASTMODIFIEDATTR_STR].strftime('%s'),'U')
                 tupleItem = ()
-                tupleItem = (key.split('/')[1],Obj)
-                ##print tupleItem.file,tupleItem.lastModifiedTime
+              
+                tupleItem = (key.split('/')[2],Obj)
+                
+                
                 yield tupleItem
 
         # The S3 API is paginated, returning up to 1000 keys at a time.
@@ -100,6 +104,7 @@ s3objects_to_delete = [];
 for items in get_matching_s3_keys(bucket=CONST_BUCKET_NAME, prefix=CONST_PREFIX_NAME, suffix='', exclude=CONST_EXCLUDE_NAME):
     partitionList.append(items)
 
+
 ##Group by on the key to get lastest modified timestamp and delete the rest
 groups = defaultdict(list)
 for k,v in partitionList:
@@ -107,17 +112,26 @@ for k,v in partitionList:
 
 ##Delete the old S3 objects and keep the latest based on the timestamp
 for key,TupleList in groups.iteritems():
+    
+
+    
     keyToRetain=max(TupleList,key=attrgetter(CONST_LASTMODIFIEDTIME_STR)).file
+    
+    
+    
     for Object in TupleList:
         if Object.file != keyToRetain:
             keys_to_delete.append(Object.file)
+            
+            
 
 
 ## Delete the old S3 objects in a batch of 1000 since batch delete has a limit of same.
 ## Showing the logic to delete the partition after processing 'D' DMS record as well
 index=0
+
 for itemsToDelete in keys_to_delete:
-    print itemsToDelete
+    #print itemsToDelete
     s3Object = {}
     s3Object['Key'] = itemsToDelete
     s3objects_to_delete.append(s3Object)
@@ -126,20 +140,17 @@ for itemsToDelete in keys_to_delete:
         S3ObjectDict = {}
         S3ObjectDict['Objects']=s3objects_to_delete
         s3.delete_objects(Bucket=CONST_BUCKET_NAME, Delete=S3ObjectDict)
-        #dataCatalogKeys_to_Delete_list=[element[element.find('employee_id=')+12:element.find('/',element.find('employee_id='))]] for element in s3objects_to_delete]
-        # Below code is delete the Partition from the Glue Data Catalog to process 'D' Opcode type DMS Record
-        #try:
-        #    response = botoClient.delete_partition(
-        #    DatabaseName='employee-tier2',
-        #    TableName='tier_2',
-        #        PartitionValues=[
-        #            dataCatalogKeys_to_Delete_list
-        #        ]
-        #    )
-        #    print "Deleted the Partition ",str(employeeInstance["employee_id"])
-        #except:
-        #    print "Partition/Key not found with Key as ", str(employeeInstance["employee_id"])
+
         s3objects_to_delete=[]
         
         
     index = index + 1 
+
+## Deleting the residual Records
+
+S3ObjectDict = {}
+S3ObjectDict['Objects']=s3objects_to_delete
+print("Final Objects to  be deleted are: ")
+print(len(S3ObjectDict['Objects']))
+s3.delete_objects(Bucket=CONST_BUCKET_NAME, Delete=S3ObjectDict)
+
