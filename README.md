@@ -51,6 +51,10 @@ The implementation consists of
 
 ![](https://github.com/dhawalkp/datalake/blob/master/Data_Pipeline_Architecture.png)
 
+## Detailed ELT Pipeline 
+
+![](https://github.com/dhawalkp/datalake/blob/master/Data_Pipeline_Architecture.png)
+
 ## Best Practices and Performance Considerations
 * One of the key design decisions in making the solution performant will be the selection of appropriate partition keys for target S3 buckets. Please read [Working with Partitioned Data in AWS Glue](https://aws.amazon.com/blogs/big-data/work-with-partitioned-data-in-aws-glue/). Partitioning the Source and Target Buckets via Relevant Partition Keys and making use of it in avoiding cross partition joins or full scans.
 
