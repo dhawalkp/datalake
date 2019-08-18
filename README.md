@@ -36,6 +36,10 @@ The implementation consists of
 * The Tier-1 bucket in this example is partitioned based on year/month/day/hour
 ## Creating Glue Data Catalog of Tier-1 Bucket for processing
 * AWS Glue Crawlers needs to be configured in order to process CDC and Full Log files in the tier-1 bucket and create data catalog for both. In this case, the Tier-1 Database in Glue will consist of 2 tables i.e. CDC and Full
+## Effective Data Crawling in DataLakes using AWS Glue
+
+
+![](https://github.com/dhawalkp/datalake/blob/master/Crawler_Architecture.png/)
 
 ## Glue ETL Job for Tier-2 Data
 * Tier-2 ETL job will re-partition based on required keys and hydrate the tier-2 buckets in S3 with S3 Objects based on the partition keys. The script is available in this repo with name - /scripts/DMS_CDC_Tier2_Repartitioning_CustomerID.py and /scripts/DMS_FullLog_Tier2_Repartitioning_CustomerID.py
